@@ -1,1 +1,1 @@
-from financelite import *
+from financelite.financelite import *
