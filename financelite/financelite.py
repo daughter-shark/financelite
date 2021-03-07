@@ -1,6 +1,6 @@
 import feedparser
 from requests import get
-from exceptions import *
+from financelite.exceptions import *
 
 NEWS_BASE_URL = "https://feeds.finance.yahoo.com/rss/2.0/headline"
 CHART_BASE_URL = "https://query1.finance.yahoo.com/v8/finance/chart"
