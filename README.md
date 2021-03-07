@@ -17,10 +17,10 @@ from financelite.exceptions import NoNewsFoundException, DataRequestException
 news = News()
 try:
     news.get_news(ticker="gme", count=5)
+    # returns 5 GME-related news
 except NoNewsFoundException:
     # handle exception
     pass
-# returns 5 GME-related news
 
 stock = Stock(ticker="gme")
 try:
