@@ -2,7 +2,7 @@
 financelite is a lightweight stock information tool that takes every complicated features out.  
 It only focuses on providing simple and intuitive, yet informative stock information.  
 
-Currently(v0.0.2), financelite is in a rapidly-evolving state. While I'll try to stay within the boundaries,
+Currently(v0.0.3), financelite is in a rapidly-evolving state. While I'll try to stay within the boundaries,
 please understand your implementation may have to change in the future upgrades.
 
 # Installation
@@ -26,5 +26,5 @@ stock.get_data(interval="1d", range="5d")
 ```
 
 # Special Thanks
-* [yahoo! finance](https://finance.yahoo.com/) for providing an awesome websites and APIs.
-* [Andrew Treadway](https://github.com/atreadw1492) for providing open source package for processing finance data.
+* [yahoo! finance](https://finance.yahoo.com/) for providing awesome websites and APIs.
+* [Andrew Treadway](https://github.com/atreadw1492) for providing an open source package for processing finance data.
