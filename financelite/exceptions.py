@@ -4,3 +4,11 @@ class NoNewsFoundException(BaseException):
 
 class DataRequestException(BaseException):
     pass
+
+
+class ItemNotValidException(BaseException):
+    pass
+
+
+class TickerNotInGroupException(BaseException):
+    pass
