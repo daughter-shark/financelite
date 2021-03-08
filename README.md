@@ -9,30 +9,67 @@ please understand your implementation may have to change in the future upgrades.
 `pip install financelite`
 
 # Example Usage
-
+### News
 ```python
-from financelite import News, Stock
-from financelite.exceptions import NoNewsFoundException, DataRequestException
+from financelite import News
+from financelite.exceptions import NoNewsFoundException
 
 news = News()
 try:
     news.get_news(ticker="gme", count=5)
     # returns 5 GME-related news
 except NoNewsFoundException:
-    # handle exception
-    pass
-
-stock = Stock(ticker="gme")
-try:
-    stock.get_live()
-    # returns GME's live price and currency
-    
-    stock.get_data(interval="1d", range="5d")
-    # returns statistics for 5 days, with 1 day interval
-except DataRequestException:
-    # handle exception
+    # raised if there aren't any news associated with the ticker.
     pass
 ```
+### Stock
+```python
+from financelite import Stock
+from financelite.exceptions import DataRequestException
+
+stock = Stock(ticker="gme")
+
+try:
+    stock.get_chart(interval="1d", range="5d")
+    # returns statistics for 5 days, with 1 day interval
+
+    stock.get_live()
+    # returns GME's live price and currency
+except DataRequestException:
+    # raised if ticker, interval, or range values are wrong
+    pass
+```
+### Group
+```python
+from financelite import Group
+from financelite.exceptions import TickerNotInGroupException, DataRequestException, ItemNotValidException
+
+group = Group()
+group.add_ticker("gme")
+group.add_ticker("bb")
+group.add_ticker("amc")
+
+try: 
+    group.remove_ticker("ac.to")
+except TickerNotInGroupException:
+    # raised if ticker does not exist within the group
+    pass
+
+try:
+    group.get_quotes(cherrypicks=["symbol", "shortName", "regularMarketPrice"])
+    # returns a dictionary with only those keys
+    
+    group.get_quotes(cherrypicks=["symbol", "shortName", "regularMarketPrice"], exclude=True)
+    # returns a dictionary with keys except these keys
+
+except DataRequestException:
+    # raised if the data request was not successful. Usually means invalid ticker.
+    pass
+except ItemNotValidException:
+    # raised if any item in the cherrypicks list is invalidd
+    pass
+```
+
 
 # Special Thanks
 * [yahoo! finance](https://finance.yahoo.com/) for providing awesome websites and APIs.
