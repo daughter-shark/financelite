@@ -15,7 +15,7 @@ def test_chart_wrong_interval_range():
     with pytest.raises(DataRequestException):
         stock.get_chart("1d", "ff")
     with pytest.raises(DataRequestException):
-        stock.get_chart("1d", "ff")
+        stock.get_chart("ff", "ff")
 
 
 def test_get_live():
