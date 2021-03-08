@@ -1,27 +1,35 @@
-import feedparser
-from requests import get
-from financelite.exceptions import *
+"""
+Please refer to the documentation provided in the README.md,
+which can be found at financelite's PyPI URL: https://pypi.org/project/financelite/
+"""
 from typing import List
+from requests import get
+import feedparser
+from financelite.exceptions import NoNewsFoundException, ItemNotValidException, \
+    TickerNotInGroupException, DataRequestException
+
 
 NEWS_BASE_URL = "https://feeds.finance.yahoo.com/rss/2.0/headline"
 CHART_BASE_URL = "https://query1.finance.yahoo.com/v8/finance/chart"
 QUOTE_BASE_URL = "https://query1.finance.yahoo.com/v7/finance/quote"
 VALID_TIME = ["1d", "5d", "1mo", "3mo", "6mo", "1y", "2y", "5y", "10y", "ytd", "max"]
 ACCEPTABLE_ITEMS = [
-    'language', 'region', 'quoteType', 'quoteSourceName', 'triggerable', 'currency', 'marketState', 'tradeable',
-    'fiftyTwoWeekRange', 'fiftyTwoWeekHighChange', 'fiftyTwoWeekHighChangePercent', 'fiftyTwoWeekLow',
-    'fiftyTwoWeekHigh', 'earningsTimestamp', 'earningsTimestampStart', 'earningsTimestampEnd',
-    'trailingAnnualDividendRate', 'trailingAnnualDividendYield', 'epsTrailingTwelveMonths', 'epsForward',
-    'epsCurrentYear', 'priceEpsCurrentYear', 'sharesOutstanding', 'bookValue', 'fiftyDayAverage',
-    'fiftyDayAverageChange', 'fiftyDayAverageChangePercent', 'twoHundredDayAverage', 'twoHundredDayAverageChange',
+    'language', 'region', 'quoteType', 'quoteSourceName', 'triggerable', 'currency', 'marketState',
+    'tradeable', 'fiftyTwoWeekRange', 'fiftyTwoWeekHighChange', 'fiftyTwoWeekHighChangePercent',
+    'fiftyTwoWeekLow', 'fiftyTwoWeekHigh', 'earningsTimestamp', 'earningsTimestampStart',
+    'earningsTimestampEnd', 'trailingAnnualDividendRate', 'trailingAnnualDividendYield',
+    'epsTrailingTwelveMonths', 'epsForward', 'epsCurrentYear', 'priceEpsCurrentYear',
+    'sharesOutstanding', 'bookValue', 'fiftyDayAverage', 'fiftyDayAverageChange',
+    'fiftyDayAverageChangePercent', 'twoHundredDayAverage', 'twoHundredDayAverageChange',
     'twoHundredDayAverageChangePercent', 'marketCap', 'forwardPE', 'priceToBook', 'sourceInterval',
-    'exchangeDataDelayedBy', 'exchange', 'shortName', 'longName', 'messageBoardId', 'exchangeTimezoneName',
-    'exchangeTimezoneShortName', 'gmtOffSetMilliseconds', 'market', 'esgPopulated', 'priceHint',
-    'postMarketChangePercent', 'postMarketTime', 'postMarketPrice', 'postMarketChange', 'regularMarketChange',
-    'regularMarketChangePercent', 'regularMarketTime', 'regularMarketPrice', 'regularMarketDayHigh',
-    'regularMarketDayRange', 'regularMarketDayLow', 'regularMarketVolume', 'regularMarketPreviousClose',
-    'bid', 'ask', 'bidSize', 'askSize', 'fullExchangeName', 'financialCurrency', 'regularMarketOpen',
-    'averageDailyVolume3Month', 'averageDailyVolume10Day', 'fiftyTwoWeekLowChange', 'fiftyTwoWeekLowChangePercent',
+    'exchangeDataDelayedBy', 'exchange', 'shortName', 'longName', 'messageBoardId',
+    'exchangeTimezoneName', 'exchangeTimezoneShortName', 'gmtOffSetMilliseconds', 'market',
+    'esgPopulated', 'priceHint', 'postMarketChangePercent', 'postMarketTime', 'postMarketPrice',
+    'postMarketChange', 'regularMarketChange', 'regularMarketChangePercent', 'regularMarketTime',
+    'regularMarketPrice', 'regularMarketDayHigh', 'regularMarketDayRange', 'regularMarketDayLow',
+    'regularMarketVolume', 'regularMarketPreviousClose', 'bid', 'ask', 'bidSize', 'askSize',
+    'fullExchangeName', 'financialCurrency', 'regularMarketOpen', 'averageDailyVolume3Month',
+    'averageDailyVolume10Day', 'fiftyTwoWeekLowChange', 'fiftyTwoWeekLowChangePercent',
     'dividendDate', 'firstTradeDateMilliseconds', 'displayName', 'symbol'
 ]
 
@@ -86,7 +94,8 @@ class Stock:
 
     def get_chart(self, interval: str, range: str) -> dict:
         """
-        valid for interval and range : ["1d","5d","1mo","3mo","6mo","1y","2y","5y","10y","ytd","max"]
+        valid for interval and range :
+        ["1d","5d","1mo","3mo","6mo","1y","2y","5y","10y","ytd","max"]
         :param interval: how granular the data is.
         :param range: how much data is pulled.
         :return: dictionary of the chart
@@ -116,16 +125,16 @@ class Group:
     def __init__(self, tickers: List[str] = None):
         self.tickers = tickers if tickers else []
 
-    def list_tickers(self) -> List[str]:
-        ticker_str = []
-        for t in self.tickers:
-            ticker_str.append(str(t))
-        return ticker_str
-
     def add_ticker(self, ticker: str):
+        """
+        :param ticker: string value of ticker symbol
+        """
         self.tickers.append(ticker)
 
     def remove_ticker(self, ticker: str):
+        """
+        :param ticker: string value of ticker symbol
+        """
         removed = False
         for t in self.tickers:
             if t == ticker:
@@ -136,6 +145,12 @@ class Group:
             raise TickerNotInGroupException
 
     def get_quotes(self, cherrypicks: List[str] = None, exclude: bool = False) -> List[dict]:
+        """
+
+        :param cherrypicks: data you want
+        :param exclude: does the opposite. data you don't want
+        :return: dictionary consists of only the wanted data
+        """
         formatted = ""
         for t in self.tickers:
             formatted += t

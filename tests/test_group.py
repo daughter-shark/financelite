@@ -14,11 +14,11 @@ def test_group():
 
 def test_group_add_remove_ticker():
     group = Group(["gme"])
-    assert len(group.list_tickers()) == 1
+    assert len(group.tickers) == 1
     group.add_ticker("bb")
-    assert len(group.list_tickers()) == 2
+    assert len(group.tickers) == 2
     group.remove_ticker("gme")
-    assert len(group.list_tickers()) == 1
+    assert len(group.tickers) == 1
     with pytest.raises(TickerNotInGroupException):
         group.remove_ticker("ff")
 
