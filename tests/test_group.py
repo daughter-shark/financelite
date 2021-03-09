@@ -3,17 +3,18 @@ import pytest
 
 gme = Stock("gme")
 bb = Stock("bb")
+dumb = Stock("fewafsdfaewaf")
 
 
 def test_group():
     group = Group()
     assert group
-    group = Group(["gme", "bb"])
+    group = Group([gme, bb])
     assert group
 
 
 def test_group_add_remove_ticker():
-    group = Group(["gme"])
+    group = Group([gme])
     assert len(group.tickers) == 1
     group.add_ticker("bb")
     assert len(group.tickers) == 2
@@ -24,13 +25,13 @@ def test_group_add_remove_ticker():
 
 
 def test_group_quotes():
-    group = Group(["gme", "bb"])
+    group = Group([gme, bb])
     assert len(group.get_quotes()) == 2
 
 
 def test_group_quotes_invalid_ticker():
     with pytest.raises(DataRequestException):
-        group = Group(["gme", "fewafsdfaewaf"])
+        group = Group([gme, dumb])
         group.get_quotes()
 
 

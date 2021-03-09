@@ -41,13 +41,23 @@ except DataRequestException:
 ```
 ### Group
 ```python
-from financelite import Group
-from financelite.exceptions import TickerNotInGroupException, DataRequestException, ItemNotValidException
+from financelite import Group, Stock
+from financelite.exceptions import TickerNotInGroupException, DataRequestException, \
+    ItemNotValidException
 
+# You can add tickers to the group like this
 group = Group()
-group.add_ticker("gme")
+group.add_ticker("gme")  # it takes in str value, then creates a Stock object with the ticker.
 group.add_ticker("bb")
 group.add_ticker("amc")
+
+# or you can initialize the group with Stock objects
+bb = Stock(ticker="bb")
+gme = Stock(ticker="gme")
+group = Group([bb, gme])
+
+group.list_tickers()
+# returns list of tickers represented as strings
 
 try: 
     group.remove_ticker("ac.to")

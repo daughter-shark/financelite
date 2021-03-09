@@ -36,6 +36,7 @@ ACCEPTABLE_ITEMS = [
 
 def _fetch(url: str) -> dict:
     """
+    Base method to retrieve data with the given url.
     :param url: url to request and fetch from
     :return: json dict of results
     """
@@ -45,6 +46,8 @@ def _fetch(url: str) -> dict:
 
 def _cherry_pick(json: dict, cherries: List[str], exclude: bool = False) -> dict:
     """
+    Used to cherry-pick data. The data returned by Group.get_quotes() is absolutely massive.
+    You can use this to filter out all the unwanted details.
     :param json: json dict to process
     :param cherries: items to cherry-pick (or not to cherry-pick)
     :param exclude: if exclude == True, it excludes the items and get everything else
@@ -73,6 +76,7 @@ class News:
 
     def get_news(self, ticker: str, count: int = 10) -> List[dict]:
         """
+        Get news associated with the set ticker
         :param ticker: string value for ticker(symbol)
         :param count: count of returned news items
         :return: list of news items
@@ -94,6 +98,7 @@ class Stock:
 
     def get_chart(self, interval: str, range: str) -> dict:
         """
+        Get periodic chart data with extra-extra details.
         valid for interval and range :
         ["1d","5d","1mo","3mo","6mo","1y","2y","5y","10y","ytd","max"]
         :param interval: how granular the data is.
@@ -111,6 +116,7 @@ class Stock:
 
     def get_live(self) -> tuple:
         """
+        Get the live price of the ticker
         :return: tuple of live price in float, and currency as str
         """
         data = self.get_chart(interval="1d", range="1d")
@@ -122,22 +128,31 @@ class Stock:
 
 
 class Group:
-    def __init__(self, tickers: List[str] = None):
+    def __init__(self, tickers: List[Stock] = None):
         self.tickers = tickers if tickers else []
+
+    def list_tickers(self) -> List[str]:
+        """
+        Used to retrieve the list of tickers in string format.
+        :return: list of string values of tickers
+        """
+        return [str(ticker) for ticker in self.tickers]
 
     def add_ticker(self, ticker: str):
         """
+        Adding the ticker is done by passing the ticker string
         :param ticker: string value of ticker symbol
         """
-        self.tickers.append(ticker)
+        self.tickers.append(Stock(ticker))
 
     def remove_ticker(self, ticker: str):
         """
+        Removing the ticker is done by passing the ticker string
         :param ticker: string value of ticker symbol
         """
         removed = False
         for t in self.tickers:
-            if t == ticker:
+            if t.ticker == ticker:
                 self.tickers.remove(t)
                 removed = True
                 break
@@ -153,7 +168,7 @@ class Group:
         """
         formatted = ""
         for t in self.tickers:
-            formatted += t
+            formatted += t.ticker
             if t != self.tickers[-1]:
                 formatted += ","
         url = QUOTE_BASE_URL + f"?symbols={formatted}"
