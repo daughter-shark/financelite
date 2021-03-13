@@ -56,7 +56,7 @@ def _cherry_pick(json: dict, cherries: List[str], exclude: bool = False) -> dict
     picked = {}
     for c in cherries:
         if c not in ACCEPTABLE_ITEMS:
-            raise ItemNotValidException
+            raise ItemNotValidException(f"{c} is not an acceptable item.")
 
     if exclude:
         for key, value in json.items():
