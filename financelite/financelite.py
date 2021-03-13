@@ -109,7 +109,7 @@ class Stock:
         content = _fetch(url)
         chart = content.get("chart")
         if chart.get("error"):
-            raise DataRequestException(chart.get("error").get("description"))
+            raise DataRequestException(self.ticker)
         return chart
 
     def get_live(self) -> tuple:
