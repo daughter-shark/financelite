@@ -124,7 +124,7 @@ class Stock:
         currency = meta.get("currency")
         return live, currency
 
-    def get_hist(self, days: int) -> list:
+    def get_hist(self, days: int) -> tuple:
         """
         Get historical data of the ticker
         :param days: days in integer
@@ -133,11 +133,13 @@ class Stock:
         if not isinstance(days, int) or days <= 1:
             raise ValueError("days must be an integer larger than 1")
         data = self.get_chart(interval="1d", range=f"{days}d")
-        result = data.get("result")[0]
+        result = data.get("result").pop()
+        meta = result.get("meta")
+        currency = meta.get("currency")
         indicators = result.get("indicators")
-        quote = indicators.get("quote")[0]
+        quote = indicators.get("quote").pop()
         close = quote.get("close")
-        return close
+        return close, currency
 
 
 class Group:

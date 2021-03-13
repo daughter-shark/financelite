@@ -27,8 +27,10 @@ def test_stock_str():
 
 
 def test_get_hist():
-    assert len(stock.get_hist(2)) == 2
-    assert len(stock.get_hist(15)) == 15
+    hist, currency = stock.get_hist(2)
+    assert len(hist) == 2
+    assert currency == "USD"
+    assert len(stock.get_hist(15)[0]) == 15
     with pytest.raises(ValueError):
         stock.get_hist(0)
     with pytest.raises(ValueError):
