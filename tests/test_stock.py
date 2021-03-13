@@ -13,8 +13,6 @@ def test_chart_wrong_interval_range():
     with pytest.raises(DataRequestException):
         stock.get_chart("ff", "5d")
     with pytest.raises(DataRequestException):
-        stock.get_chart("1d", "ff")
-    with pytest.raises(DataRequestException):
         stock.get_chart("ff", "ff")
 
 
@@ -26,3 +24,18 @@ def test_get_live():
 
 def test_stock_str():
     assert str(stock) == "gme"
+
+
+def test_get_hist():
+    assert len(stock.get_hist(2)) == 2
+    assert len(stock.get_hist(15)) == 15
+    with pytest.raises(ValueError):
+        stock.get_hist(0)
+    with pytest.raises(ValueError):
+        stock.get_hist(-1)
+    with pytest.raises(ValueError):
+        stock.get_hist(0.0)
+    with pytest.raises(ValueError):
+        stock.get_hist(1.2)
+    with pytest.raises(ValueError):
+        stock.get_hist("foo")

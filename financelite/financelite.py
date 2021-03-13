@@ -99,8 +99,8 @@ class Stock:
     def get_chart(self, interval: str, range: str) -> dict:
         """
         Get periodic chart data with extra-extra details.
-        valid for interval and range :
-        ["1d","5d","1mo","3mo","6mo","1y","2y","5y","10y","ytd","max"]
+        valid for interval :
+        [1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 1d, 5d, 1wk, 1mo, 3mo]
         :param interval: how granular the data is.
         :param range: how much data is pulled.
         :return: dictionary of the chart
@@ -110,8 +110,6 @@ class Stock:
         chart = content.get("chart")
         if chart.get("error"):
             raise DataRequestException(chart.get("error").get("description"))
-        if range not in VALID_TIME:
-            raise DataRequestException(f"Invalid range: {range}")
         return chart
 
     def get_live(self) -> tuple:
@@ -125,6 +123,21 @@ class Stock:
         live = meta.get("regularMarketPrice")
         currency = meta.get("currency")
         return live, currency
+
+    def get_hist(self, days: int) -> list:
+        """
+        Get historical data of the ticker
+        :param days: days in integer
+        :return: list of closed prices of the ticker
+        """
+        if not isinstance(days, int) or days <= 1:
+            raise ValueError("days must be an integer larger than 1")
+        data = self.get_chart(interval="1d", range=f"{days}d")
+        result = data.get("result")[0]
+        indicators = result.get("indicators")
+        quote = indicators.get("quote")[0]
+        close = quote.get("close")
+        return close
 
 
 class Group:
