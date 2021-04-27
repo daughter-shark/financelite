@@ -195,7 +195,7 @@ class Stock:
         :return: list of closed prices of the ticker
         """
         if not re.match("^[1-9][0-9]*(wk|mo|d|yr)$", data_range, re.IGNORECASE):
-            raise DataRequestException("Invalid range parameter")
+            raise DataRequestException(f"Invalid range parameter: {data_range}")
         data = self.get_chart(interval="1d", range=data_range)
         result = data.get("result").pop()
         timestamps = result.get("timestamp")
