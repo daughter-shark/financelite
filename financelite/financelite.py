@@ -5,8 +5,13 @@ which can be found at financelite's PyPI URL: https://pypi.org/project/financeli
 from typing import List
 from requests import get
 import feedparser
-from financelite.exceptions import NoNewsFoundException, ItemNotValidException, \
-    TickerNotInGroupException, DataRequestException
+import re
+from financelite.exceptions import (
+    NoNewsFoundException,
+    ItemNotValidException,
+    TickerNotInGroupException,
+    DataRequestException,
+)
 
 
 NEWS_BASE_URL = "https://feeds.finance.yahoo.com/rss/2.0/headline"
@@ -14,23 +19,79 @@ CHART_BASE_URL = "https://query1.finance.yahoo.com/v8/finance/chart"
 QUOTE_BASE_URL = "https://query1.finance.yahoo.com/v7/finance/quote"
 VALID_TIME = ["1d", "5d", "1mo", "3mo", "6mo", "1y", "2y", "5y", "10y", "ytd", "max"]
 ACCEPTABLE_ITEMS = [
-    'language', 'region', 'quoteType', 'quoteSourceName', 'triggerable', 'currency', 'marketState',
-    'tradeable', 'fiftyTwoWeekRange', 'fiftyTwoWeekHighChange', 'fiftyTwoWeekHighChangePercent',
-    'fiftyTwoWeekLow', 'fiftyTwoWeekHigh', 'earningsTimestamp', 'earningsTimestampStart',
-    'earningsTimestampEnd', 'trailingAnnualDividendRate', 'trailingAnnualDividendYield',
-    'epsTrailingTwelveMonths', 'epsForward', 'epsCurrentYear', 'priceEpsCurrentYear',
-    'sharesOutstanding', 'bookValue', 'fiftyDayAverage', 'fiftyDayAverageChange',
-    'fiftyDayAverageChangePercent', 'twoHundredDayAverage', 'twoHundredDayAverageChange',
-    'twoHundredDayAverageChangePercent', 'marketCap', 'forwardPE', 'priceToBook', 'sourceInterval',
-    'exchangeDataDelayedBy', 'exchange', 'shortName', 'longName', 'messageBoardId',
-    'exchangeTimezoneName', 'exchangeTimezoneShortName', 'gmtOffSetMilliseconds', 'market',
-    'esgPopulated', 'priceHint', 'postMarketChangePercent', 'postMarketTime', 'postMarketPrice',
-    'postMarketChange', 'regularMarketChange', 'regularMarketChangePercent', 'regularMarketTime',
-    'regularMarketPrice', 'regularMarketDayHigh', 'regularMarketDayRange', 'regularMarketDayLow',
-    'regularMarketVolume', 'regularMarketPreviousClose', 'bid', 'ask', 'bidSize', 'askSize',
-    'fullExchangeName', 'financialCurrency', 'regularMarketOpen', 'averageDailyVolume3Month',
-    'averageDailyVolume10Day', 'fiftyTwoWeekLowChange', 'fiftyTwoWeekLowChangePercent',
-    'dividendDate', 'firstTradeDateMilliseconds', 'displayName', 'symbol'
+    "language",
+    "region",
+    "quoteType",
+    "quoteSourceName",
+    "triggerable",
+    "currency",
+    "marketState",
+    "tradeable",
+    "fiftyTwoWeekRange",
+    "fiftyTwoWeekHighChange",
+    "fiftyTwoWeekHighChangePercent",
+    "fiftyTwoWeekLow",
+    "fiftyTwoWeekHigh",
+    "earningsTimestamp",
+    "earningsTimestampStart",
+    "earningsTimestampEnd",
+    "trailingAnnualDividendRate",
+    "trailingAnnualDividendYield",
+    "epsTrailingTwelveMonths",
+    "epsForward",
+    "epsCurrentYear",
+    "priceEpsCurrentYear",
+    "sharesOutstanding",
+    "bookValue",
+    "fiftyDayAverage",
+    "fiftyDayAverageChange",
+    "fiftyDayAverageChangePercent",
+    "twoHundredDayAverage",
+    "twoHundredDayAverageChange",
+    "twoHundredDayAverageChangePercent",
+    "marketCap",
+    "forwardPE",
+    "priceToBook",
+    "sourceInterval",
+    "exchangeDataDelayedBy",
+    "exchange",
+    "shortName",
+    "longName",
+    "messageBoardId",
+    "exchangeTimezoneName",
+    "exchangeTimezoneShortName",
+    "gmtOffSetMilliseconds",
+    "market",
+    "esgPopulated",
+    "priceHint",
+    "postMarketChangePercent",
+    "postMarketTime",
+    "postMarketPrice",
+    "postMarketChange",
+    "regularMarketChange",
+    "regularMarketChangePercent",
+    "regularMarketTime",
+    "regularMarketPrice",
+    "regularMarketDayHigh",
+    "regularMarketDayRange",
+    "regularMarketDayLow",
+    "regularMarketVolume",
+    "regularMarketPreviousClose",
+    "bid",
+    "ask",
+    "bidSize",
+    "askSize",
+    "fullExchangeName",
+    "financialCurrency",
+    "regularMarketOpen",
+    "averageDailyVolume3Month",
+    "averageDailyVolume10Day",
+    "fiftyTwoWeekLowChange",
+    "fiftyTwoWeekLowChangePercent",
+    "dividendDate",
+    "firstTradeDateMilliseconds",
+    "displayName",
+    "symbol",
 ]
 
 
@@ -81,7 +142,10 @@ class News:
         :param count: count of returned news items
         :return: list of news items
         """
-        url = NEWS_BASE_URL + f"?region={self.region}&lang={self.lang}&s={ticker}&count={count}"
+        url = (
+            NEWS_BASE_URL
+            + f"?region={self.region}&lang={self.lang}&s={ticker}&count={count}"
+        )
         parsed = feedparser.parse(url)
         news = parsed.get("entries")
         if not news:
@@ -124,22 +188,28 @@ class Stock:
         currency = meta.get("currency")
         return live, currency
 
-    def get_hist(self, days: int) -> tuple:
+    def get_hist(self, data_range: str) -> dict:
         """
         Get historical data of the ticker
-        :param days: days in integer
+        :param data_range: string of valid range
         :return: list of closed prices of the ticker
         """
-        if not isinstance(days, int) or days <= 1:
-            raise ValueError("days must be an integer larger than 1")
-        data = self.get_chart(interval="1d", range=f"{days}d")
+        if not re.match("^[1-9][0-9]*(wk|mo|d|yr)$", data_range, re.IGNORECASE):
+            raise DataRequestException("Invalid range parameter")
+        data = self.get_chart(interval="1d", range=data_range)
         result = data.get("result").pop()
+        timestamps = result.get("timestamp")
         meta = result.get("meta")
         currency = meta.get("currency")
         indicators = result.get("indicators")
         quote = indicators.get("quote").pop()
         close = quote.get("close")
-        return close, currency
+        return dict(
+            hist=close,
+            currency=currency,
+            start_time=timestamps[0],
+            end_time=timestamps[-1],
+        )
 
 
 class Group:
@@ -174,7 +244,9 @@ class Group:
         if not removed:
             raise TickerNotInGroupException
 
-    def get_quotes(self, cherrypicks: List[str] = None, exclude: bool = False) -> List[dict]:
+    def get_quotes(
+        self, cherrypicks: List[str] = None, exclude: bool = False
+    ) -> List[dict]:
         """
 
         :param cherrypicks: data you want
