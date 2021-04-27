@@ -36,8 +36,8 @@ try:
     stock.get_live()
     # returns GME's live price and currency
     
-    stock.get_hist(days=5)
-    # returns 5 days worth of closed price data
+    stock.get_hist(data_range="1wk")
+    # returns 1 week worth of closed price data
 except DataRequestException:
     # raised if ticker, interval, or range values are wrong
     pass
