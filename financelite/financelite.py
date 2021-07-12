@@ -17,6 +17,7 @@ from financelite.exceptions import (
 NEWS_BASE_URL = "https://feeds.finance.yahoo.com/rss/2.0/headline"
 CHART_BASE_URL = "https://query1.finance.yahoo.com/v8/finance/chart"
 QUOTE_BASE_URL = "https://query1.finance.yahoo.com/v7/finance/quote"
+DEFAULT_HEADERS = {"User-Agent": "Mozilla/5.0"}
 VALID_TIME = ["1d", "5d", "1mo", "3mo", "6mo", "1y", "2y", "5y", "10y", "ytd", "max"]
 ACCEPTABLE_ITEMS = [
     "language",
@@ -101,7 +102,7 @@ def _fetch(url: str) -> dict:
     :param url: url to request and fetch from
     :return: json dict of results
     """
-    request = get(url)
+    request = get(url, headers=DEFAULT_HEADERS)
     return request.json()
 
 
